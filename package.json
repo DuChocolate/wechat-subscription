@@ -15,5 +15,14 @@
   "bugs": {
     "url": "https://github.com/DuChocolate/wechat-subscription/issues"
   },
-  "homepage": "https://github.com/DuChocolate/wechat-subscription#readme"
+  "homepage": "https://github.com/DuChocolate/wechat-subscription#readme",
+  "dependencies": {
+    "bluebird": "^3.5.3",
+    "koa": "^2.7.0",
+    "localtunnel": "^1.9.1",
+    "raw-body": "^2.3.3",
+    "request": "^2.88.0",
+    "sha1": "^1.1.1",
+    "xml2js": "^0.4.19"
+  }
 }

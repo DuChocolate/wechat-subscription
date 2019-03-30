@@ -1,0 +1,16 @@
+npm-debug.log
+.DS_Store
+/node_modules
+static/.DS_Store
+.idea/*
+.idea/workspace.xml
+phpunit.xml
+npm-debug
+__MACOSX
+dist/js/vendor.js
+dist/js/app.js
+dist/js/*
+dist/css/*
+dist/src/BaseJs*
+.vscode
+.vscode/*
