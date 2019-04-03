@@ -1,13 +1,13 @@
 'use strict'
 var sha1 = require('sha1');
-var gerRawBody = require('raw-body');
+var getRawBody = require('raw-body');
 var Wechat = require('./wechat');
 var util = require('./util');
 
 
 
-module.exports = function(opts) {
-    // var wechat = new Wechat(opts);
+module.exports = function(opts, handler) {
+    var wechat = new Wechat(opts);
     return async function(ctx,next){
         await next();
         const query = ctx.request.query;
@@ -29,31 +29,16 @@ module.exports = function(opts) {
                 ctx.body = 'wrong';
                 return false;
             }
-            var data = await gerRawBody(ctx.req,{
+            var data = await getRawBody(ctx.req,{
                 length: ctx.request.length,
                 limit:'1mb',
                 encoding: ctx.request.charset || 'utf-8'
             });
             var content = await util.parseXMLAsync(data);
             var message = util.formatMessage(content.xml);
-            console.log('---mm--',message);
-            if(message.MsgType === 'event'){
-                if(message.Event === 'subscribe'){
-                    var now = new Date().getTime();
-                    ctx.status = 200;
-                    ctx.type = 'application/xml';
-                    ctx.body = '<xml>' +
-                        '<ToUserName><![CDATA[' + message.FromUserName+ ']]></ToUserName>' +
-                        '<FromUserName><![CDATA[' + message.ToUserName + ']]></FromUserName>' +
-                        '<CreateTime>' + now + '</CreateTime>' +
-                        '<MsgType><![CDATA[text]]></MsgType>' +
-                        '<Content><![CDATA[你好，你是大美女]]></Content>' +
-                        // '<MsgId>1234567890123456</MsgId>' +
-                    '</xml>';
-                    return;
-                }
-            }
-
+            ctx.weixin = message;
+            await handler.call(ctx, message, next);
+            wechat.reply.call(ctx,message);
         }
     }
 }
