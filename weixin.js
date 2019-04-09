@@ -66,13 +66,68 @@ exports.reply = async function(weixin,next){
             }
         }else if(content === '9'){
             var data = await wechatApi.uploadMaterial('video',__dirname + '/6.mp4',{type:'video', description: '{"title":"标题","introduction":"非常洋气的描述"}'});
-            console.log('------ff---',data);
             reply = {
                 type: 'video',
                 title:'学习视频',
                 description:'这只是一小段',
                 mediaId: data.media_id
             }
+        }else if(content === '10'){
+            var picData = await wechatApi.uploadMaterial('image',__dirname + '/2.jpg',{});
+            var media = {
+                articles: [{
+                    title: 'tututuut',
+                    thumb_media_id: picData.media_id,
+                    author: 'dudu',
+                    digest: '摘要',
+                    show_cover_pic: 1,
+                    content: '没有内容',
+                    content_source_url: 'https://github.com'
+                },{
+                    title: 'tututuut2222',
+                    thumb_media_id: picData.media_id,
+                    author: 'dudu',
+                    digest: '摘要222',
+                    show_cover_pic: 1,
+                    content: '没有内容2222',
+                    content_source_url: 'https://github.com'
+                },{
+                    title: 'tututuut3333',
+                    thumb_media_id: picData.media_id,
+                    author: 'dudu',
+                    digest: '摘要333',
+                    show_cover_pic: 1,
+                    content: '没有内容333',
+                    content_source_url: 'https://github.com'
+                }]
+            }
+            var data = await wechatApi.uploadMaterial('news', media, {});
+            
+            data = await wechatApi.fetchdMaterial(data.media_id,'news',{});
+            console.log('---hh---',data);
+            var items = data.news_item;
+            var news = [];
+            items.forEach(function(item){
+                news.push({
+                    title: item.title,
+                    description: item.digest,
+                    picUrl: picData.url,
+                    url: item.url
+                })
+            });
+            reply = news;
+        }else if(content === '11'){
+            var count = await wechatApi.countMaterial();
+            console.log(JSON.stringify(count));
+            var list = await wechatApi.batchMaterial({type:'image',offset:0,count:10});
+            // var result = await [
+            //     wechatApi.batchMaterial({type:'image',offset:0,count:10}),
+            //     wechatApi.batchMaterial({type:'video',offset:0,count:10}),
+            //     wechatApi.batchMaterial({type:'news',offset:0,count:10}),
+            //     wechatApi.batchMaterial({type:'voice',offset:0,count:10})
+            // ];
+            console.log(list);
+            reply = '1';
         }
         this.body = reply;
     }

@@ -9,12 +9,18 @@ var prefix = 'https://api.weixin.qq.com/cgi-bin/'
 var api = {
     accessToken: prefix + 'token?grant_type=client_credential',
     temporary: {
-        upload: prefix + 'media/upload?'
+        upload: prefix + 'media/upload?',
+        fetch: prefix + 'media/get?'
     },
     permanent: {
         upload: prefix + 'material/add_material?',
+        fetch: prefix + 'material/get_material?',
         uploadNews: prefix + 'material/add_news?',
-        uploadNewsPic: prefix + 'media/uploadimg?'
+        uploadNewsPic: prefix + 'media/uploadimg?',
+        del: prefix + 'material/del_material?',
+        update: prefix + 'material/update_news?',
+        count: prefix + 'material/get_materialcount?',
+        batch: prefix + 'material/batchget_material?'
     }
 }
 
@@ -112,8 +118,129 @@ Wechat.prototype.uploadMaterial = function(type, material, permanent){
             }else{
                 options.formData = form;
             }
-            console.log('----yy---',options);
             request(options).then(function(response){
+                var _data = response.body;
+                if(_data){
+                    resolve(_data);
+                }else{
+                    throw new Error('Upload material fails');
+                }
+            }).catch(function(err){
+                reject(err);
+            });
+        })
+    });
+}
+Wechat.prototype.fetchdMaterial = function(mediaId, type, permanent){
+    var that = this;
+    var form = {};
+    var fetchUrl = api.temporary.fetch;
+    if(permanent){
+        fetchUrl = api.permanent.fetch;
+    }
+    return new Promise(function(resolve,reject){
+        that.fetchAccessToken().then(function(data){
+            var url = fetchUrl + 'access_token=' + data.access_token + '&media_id=' + mediaId;
+            var form = {};
+            var options = {method:'POST',url:url,json:true};
+            if(permanent){
+                form.media_id = mediaId;
+                form.access_token = data.access_token;
+                options.body = form;
+            }else{
+                if(type === 'video'){
+                    url = url.replace('https://','http://');
+                }
+                url += '&media_id=' + mediaId;
+            }
+            if(type === 'news' || type === 'video'){
+                request(options).then(function(response){
+                    var _data = response.body;
+                    if(_data){
+                        resolve(_data);
+                    }else{
+                        throw new Error('Upload material fails');
+                    }
+                }).catch(function(err){
+                    reject(err);
+                });
+            }else{
+                resolve(url);
+            }
+            
+        })
+    });
+}
+Wechat.prototype.deleteMaterial = function(mediaId){
+    var that = this;
+    var form = {
+        media_id: mediaId
+    };
+    return new Promise(function(resolve,reject){
+        that.fetchAccessToken().then(function(data){
+            var url = api.permanent.del + 'access_token=' + data.access_token + '&media_id=' + mediaId;
+            request({method: 'POST',url:url,body:form,json: true}).then(function(response){
+                var _data = response.body;
+                if(_data){
+                    resolve(_data);
+                }else{
+                    throw new Error('Upload material fails');
+                }
+            }).catch(function(err){
+                reject(err);
+            });
+        })
+    });
+}
+Wechat.prototype.updateMaterial = function(mediaId, news){
+    var that = this;
+    var form = {
+        media_id: mediaId
+    };
+    _.extend(form, news);
+    return new Promise(function(resolve,reject){
+        that.fetchAccessToken().then(function(data){
+            var url = api.permanent.update + 'access_token=' + data.access_token + '&media_id=' + mediaId;
+            request({method: 'POST',url:url,body:form,json: true}).then(function(response){
+                var _data = response.body;
+                if(_data){
+                    resolve(_data);
+                }else{
+                    throw new Error('Upload material fails');
+                }
+            }).catch(function(err){
+                reject(err);
+            });
+        })
+    });
+}
+Wechat.prototype.countMaterial = function(){
+    var that = this;
+    return new Promise(function(resolve,reject){
+        that.fetchAccessToken().then(function(data){
+            var url = api.permanent.count + 'access_token=' + data.access_token;
+            request({method: 'GET',url:url,json: true}).then(function(response){
+                var _data = response.body;
+                if(_data){
+                    resolve(_data);
+                }else{
+                    throw new Error('Upload material fails');
+                }
+            }).catch(function(err){
+                reject(err);
+            });
+        })
+    });
+}
+Wechat.prototype.batchMaterial = function(options){
+    var that = this;
+    options.type = options.type || 'image';
+    options.offset = options.offset || 0;
+    options.count = options.count || 1;
+    return new Promise(function(resolve,reject){
+        that.fetchAccessToken().then(function(data){
+            var url = api.permanent.batch + 'access_token=' + data.access_token;
+            request({method: 'POST',url:url,body:options,json: true}).then(function(response){
                 var _data = response.body;
                 if(_data){
                     resolve(_data);
