@@ -5,6 +5,7 @@ var wechatApi = new Wechat(config.wechat);
 exports.reply = async function(weixin,next){
     var message = weixin;
     if(message.MsgType === 'event'){
+        console.log('---hh---',message);
         if(message.Event === 'subscribe'){
             if(message.EventKey){
                 console.log('扫二维码进来：' + message.EventKey + ' ' + message.ticket);
@@ -128,6 +129,40 @@ exports.reply = async function(weixin,next){
             // ];
             console.log(list);
             reply = '1';
+        }else if(content === '12'){
+            var result2 = await wechatApi.deleteGroup(101);
+            var group6 = await wechatApi.fetchGroup();
+            console.log('----移动后的所有分组--', group6);
+
+
+            // var group = await wechatApi.createGroup('wechatgroupName1');
+            // console.log('----gg--',group);
+            // var groups = await wechatApi.fetchGroup();
+            // console.log('----加了分组--', groups);
+            // var group2 = await wechatApi.checkGroup(message.FromUserName);
+            // console.log('----查看自己的分组--', group2);
+            // var group3 = await wechatApi.moveGroup(message.FromUserName,100);
+            // console.log('----移动到100--', group3);
+            
+            // var group5 = await wechatApi.moveGroup([message.FromUserName],2);
+            // console.log('----批量移动到2--', group5);
+            // var group6 = await wechatApi.fetchGroup();
+            // console.log('----批量移动后的所有分组--', group6);
+            // var result = await wechatApi.updateGroup(100,'新分组名字');
+            // console.log('----修改分组名字--', result);
+            // var group7 = await wechatApi.fetchGroup();
+            // console.log('----修改分组名后的所有分组--', group7);
+            reply = 'Group done';
+        }else if(content === '13'){
+            var user = await wechatApi.fetchUsers(message.FromUserName);
+            console.log('----用户信息--', user);
+            var userList = await wechatApi.fetchUsers([{openid: message.FromUserName,lang:'en'}]);
+            console.log('----用户信息列表--', userList);
+            reply = JSON.stringify(user);
+        }else if(content === '14'){
+            var userlist = await wechatApi.listUsers();
+            console.log('----用户列表----', userlist);
+            reply = userlist.total;
         }
         this.body = reply;
     }

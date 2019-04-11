@@ -37,8 +37,8 @@ module.exports = function(opts, handler) {
             var content = await util.parseXMLAsync(data);
             var message = util.formatMessage(content.xml);
             ctx.weixin = message;
-            await handler.call(ctx, message, next);
-            wechat.reply.call(ctx,message);
+            await handler.call(ctx, message, next);  //根据用户所发送的信息封装content，将content赋值给body
+            wechat.reply.call(ctx,message);    //依据tpl模板将body处理成合适的形式，并发送给用户
         }
     }
 }
