@@ -36,6 +36,12 @@ var api = {
         fetch: prefix + 'user/info?',
         batchFetch: prefix + 'user/info/batchget?',
         list: prefix + 'user/get?'
+    },
+    menu: {
+        create: prefix + 'menu/create?',
+        get: prefix + 'menu/get?',
+        del: prefix + 'menu/delete?',
+        current: prefix + 'get_current_selfmenu_info?'
     }
 }
 
@@ -498,6 +504,96 @@ Wechat.prototype.listUsers = function(openId){
                     resolve(_data);
                 }else{
                     throw new Error('Remark user fails');
+                }
+            }).catch(function(err){
+                reject(err);
+            });
+        })
+    });
+}
+Wechat.prototype.creatMenu = function(menu){
+    var that = this;
+    return new Promise(function(resolve,reject){
+        that.fetchAccessToken().then(function(data){
+            var url = api.menu.create + 'access_token=' + data.access_token;
+            request({method:'POST',url:url,body:menu,json: true}).then(function(response){
+                var _data = response.body;
+                if(_data){
+                    resolve(_data);
+                }else{
+                    throw new Error('Create menu fails');
+                }
+            }).catch(function(err){
+                reject(err);
+            });
+        })
+    });
+}
+Wechat.prototype.getMenu = function(){
+    var that = this;
+    return new Promise(function(resolve,reject){
+        that.fetchAccessToken().then(function(data){
+            var url = api.menu.get + 'access_token=' + data.access_token;
+            request({method:'GET',url:url,json: true}).then(function(response){
+                var _data = response.body;
+                if(_data){
+                    resolve(_data);
+                }else{
+                    throw new Error('Create menu fails');
+                }
+            }).catch(function(err){
+                reject(err);
+            });
+        })
+    });
+}
+Wechat.prototype.getMenu = function(){
+    var that = this;
+    return new Promise(function(resolve,reject){
+        that.fetchAccessToken().then(function(data){
+            var url = api.menu.create + 'access_token=' + data.access_token;
+            request({method:'GET',url:url,json: true}).then(function(response){
+                var _data = response.body;
+                if(_data){
+                    resolve(_data);
+                }else{
+                    throw new Error('Get menu fails');
+                }
+            }).catch(function(err){
+                reject(err);
+            });
+        })
+    });
+}
+Wechat.prototype.deleteMenu = function(){
+    var that = this;
+    return new Promise(function(resolve,reject){
+        that.fetchAccessToken().then(function(data){
+            var url = api.menu.del + 'access_token=' + data.access_token;
+            request({method:'GET',url:url,json: true}).then(function(response){
+                var _data = response.body;
+                if(_data){
+                    resolve(_data);
+                }else{
+                    throw new Error('Create menu fails');
+                }
+            }).catch(function(err){
+                reject(err);
+            });
+        })
+    });
+}
+Wechat.prototype.getCurrentMenu = function(){
+    var that = this;
+    return new Promise(function(resolve,reject){
+        that.fetchAccessToken().then(function(data){
+            var url = api.menu.current + 'access_token=' + data.access_token;
+            request({method:'GET',url:url,json: true}).then(function(response){
+                var _data = response.body;
+                if(_data){
+                    resolve(_data);
+                }else{
+                    throw new Error('Create menu fails');
                 }
             }).catch(function(err){
                 reject(err);
