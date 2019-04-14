@@ -1,9 +1,19 @@
 'use strict'
-var config = require('./config');
-var Wechat = require('./wechat/wechat');
+var path = require('path');
+var config = require('../config');
+var Wechat = require('../wechat/wechat');
+var menu = require('./menu');
 var wechatApi = new Wechat(config.wechat);
+
+
+
+
 exports.reply = async function(weixin,next){
     var message = weixin;
+    wechatApi.deleteMenu().then(function(){
+        console.log('---66666666----');
+        return wechatApi.creatMenu(menu);
+    })
     if(message.MsgType === 'event'){
         console.log('---hh---',message);
         if(message.Event === 'subscribe'){
@@ -23,6 +33,33 @@ exports.reply = async function(weixin,next){
             this.body = '看到你扫了一下哦';
         }else if(message.Event === 'VIEW'){
             this.body = '您点击了菜单中的链接：' + message.EventKey;
+        }else if(message.Event === 'scancode_push'){
+            console.log(message.ScanCodeInfo.ScanType);
+            console.log(message.ScanCodeInfo.ScanResult);
+            this.body = 'scancode_push您点击了菜单中的：' + message.EventKey;
+        }else if(message.Event === 'scancode_waitmsg'){
+            console.log(message.ScanCodeInfo.ScanType);
+            console.log(message.ScanCodeInfo.ScanResult);
+            this.body = 'scancode_waitmsg您点击了菜单中的：' + message.EventKey;
+        }else if(message.Event === 'pic_sysphoto'){
+            console.log(message.SendPicsInfo.PicList);
+            console.log(message.SendPicsInfo.Count);
+            this.body = 'pic_sysphoto您点击了菜单中的：' + message.EventKey;
+        }else if(message.Event === 'pic_photo_or_album'){
+            console.log(message.SendPicsInfo.PicList);
+            console.log(message.SendPicsInfo.Count);
+            this.body = 'pic_photo_or_album您点击了菜单中的：' + message.EventKey;
+        }else if(message.Event === 'pic_weixin'){
+            console.log(message.SendPicsInfo.PicList);
+            console.log(message.SendPicsInfo.Count);
+            this.body = 'pic_weixin您点击了菜单中的：' + message.EventKey;
+        }else if(message.Event === 'location_select'){
+            console.log(message.SendLocationInfo.Location_X);
+            console.log(message.SendLocationInfo.Location_Y);
+            console.log(message.SendLocationInfo.Scale);
+            console.log(message.SendLocationInfo.Label);
+            console.log(message.SendLocationInfo.Poiname);
+            this.body = 'location_select您点击了菜单中的：' + message.EventKey;
         }
     }else if(message.MsgType === 'text'){
         var content = message.Content;
@@ -46,13 +83,13 @@ exports.reply = async function(weixin,next){
                 url: 'https://github.com/'
             }]
         }else if(content === '5'){
-            var data = await wechatApi.uploadMaterial('image',__dirname + '/2.jpg');
+            var data = await wechatApi.uploadMaterial('image',path.join(__dirname, '../2.jpg'));
             reply = {
                 type: 'image',
                 mediaId: data.media_id
             }
         }else if(content === '6'){
-            var data = await wechatApi.uploadMaterial('video',__dirname + '/6.mp4');
+            var data = await wechatApi.uploadMaterial('video',path.join(__dirname, '../6.mp4'));
             reply = {
                 type: 'video',
                 title:'学习视频',
@@ -60,13 +97,13 @@ exports.reply = async function(weixin,next){
                 mediaId: data.media_id
             }
         }else if(content === '8'){
-            var data = await wechatApi.uploadMaterial('image',__dirname + '/2.jpg',{type:'image'});
+            var data = await wechatApi.uploadMaterial('image',path.join(__dirname, '../2.jpg'),{type:'image'});
             reply = {
                 type: 'image',
                 mediaId: data.media_id
             }
         }else if(content === '9'){
-            var data = await wechatApi.uploadMaterial('video',__dirname + '/6.mp4',{type:'video', description: '{"title":"标题","introduction":"非常洋气的描述"}'});
+            var data = await wechatApi.uploadMaterial('video',path.join(__dirname, '../6.mp4'),{type:'video', description: '{"title":"标题","introduction":"非常洋气的描述"}'});
             reply = {
                 type: 'video',
                 title:'学习视频',
@@ -74,7 +111,7 @@ exports.reply = async function(weixin,next){
                 mediaId: data.media_id
             }
         }else if(content === '10'){
-            var picData = await wechatApi.uploadMaterial('image',__dirname + '/2.jpg',{});
+            var picData = await wechatApi.uploadMaterial('image',path.join(__dirname, '../2.jpg'),{});
             var media = {
                 articles: [{
                     title: 'tututuut',
