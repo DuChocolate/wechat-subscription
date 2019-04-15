@@ -54,6 +54,8 @@ function Wechat(opts){
     this.appSecret = opts.appSecret;
     this.getAccessToken = opts.getAccessToken;
     this.saveAccessToken = opts.saveAccessToken;
+    this.getTicket = opts.getTicket;
+    this.saveTicket = opts.saveTicket;
     this.fetchAccessToken();
 }
 Wechat.prototype.fetchAccessToken = function(data){
@@ -99,7 +101,7 @@ Wechat.prototype.fetchTicket = function(accessToken){
         return Promise.resolve(data);
     })
 }
-Wechat.prototype.updateTicket = function(){
+Wechat.prototype.updateTicket = function(access_token){
     var url = api.ticket.get + 'access_token=' + access_token + '&type=jsapi';
     return new Promise(function(resolve,reject){
         request({url: url, json: true}).then(function(response){

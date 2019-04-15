@@ -6,6 +6,8 @@ var reply = require('./wx/reply');
 // 注意：引入的方式
 const router = require('koa-router')();
 const views = require('koa-views');
+var crypto = require('crypto');
+var WechatApi = require('./wechat/wechat');
 
 var app = new Koa();
 // 配置模版引擎中间件
@@ -30,9 +32,45 @@ var ejs = require('ejs');
 //         </body>
 //     </html>
 // */})
+
+var createNonce = function(){
+    return Math.random().toString(36).substr(2,15);
+}
+var createTimestamp = function(){
+    return parseInt(new Date().getTime() / 1000, 10) + '';
+}
+var _sign = function(noncestr, ticket, timestamp, url){
+    var params = [
+        'noncestr=' + noncestr,
+        'jsapi_ticket=' + ticket,
+        'timestamp=' + timestamp,
+        'url=' + url
+    ];
+    var str = params.sort().join('&');
+    var shasum = crypto.createHash('sha1');
+    shasum.update(str);
+    return shasum.digest('hex');
+}
+function sign(ticket, url){
+    var noncestr = createNonce();
+    var timestamp = createTimestamp();
+    var signature = _sign(noncestr,ticket,timestamp,url);
+    return{
+        noncestr:noncestr,
+        timestamp:timestamp,
+        signature:signature
+    };
+}
 router.get('/movie',async (ctx,next)=>{
-    console.log('--11111----',ctx.request.url,ctx.request.url.indexOf('/movie')>-1);
-    await ctx.render('index',{});
+    var wechatApi = new WechatApi(config.wechat);
+    var data = await wechatApi.fetchAccessToken();
+    var access_token = data.access_token;
+    var ticketData = await wechatApi.fetchTicket(access_token);
+    var ticket = ticketData.ticket;
+    var url = ctx.request.url;
+    var params = sign(ticket, url);
+    console.log('-------',params);
+    await ctx.render('index',params);
 });
 
 // 作用:启动路由
