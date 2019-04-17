@@ -1,24 +1,37 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>猜电影</title>
+        <title>搜电影</title>
         <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1">
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     </head>
     <body>
         <h1>点击标题，开始录音翻译</h1>
         <p id="title"></p>
+        <div id="doctor"></div>
+        <div id="year"></div>
         <div id="poster"></div>
-        <script src="http://www.zeptojs.cn/skin/zepto-docs.min.js"></script>
-        <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        <script src="https://zeptojs.com/zepto.min.js"></script>
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
         <script>
             wx.config({
-                debug: true,
+                debug: false,
                 appId: 'wx11b2246e364f6349',
                 timestamp: '<%= timestamp %>',
                 nonceStr: '<%= noncestr %>',
                 signature: '<%= signature %>',
                 jsApiList: ['startRecord', 'stopRecord', 'onVoiceRecordEnd', 'translateVoice']
-            })
+            });
+            wx.ready(function () {   //需在用户可能点击分享按钮前就先调用
+                console.log('====hahha-====');
+                wx.checkJsApi({
+                    jsApiList: ['onVoiceRecordEnd'], // 需要检测的JS接口列表，所有JS接口列表见附录2,
+                    success: function(res) {
+                        console.log('----rrr----',res);
+                    }
+                });
+            });
+            
         </script>
     </body>
 </html>

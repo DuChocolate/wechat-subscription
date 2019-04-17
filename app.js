@@ -3,6 +3,7 @@ var Koa = require('koa');
 var wechat = require('./wechat/g');
 var config = require('./config');
 var reply = require('./wx/reply');
+const koaStatic = require('koa-static');
 // 注意：引入的方式
 const router = require('koa-router')();
 const views = require('koa-views');
@@ -14,6 +15,9 @@ var app = new Koa();
 // 如果这样配置不修改html后缀g改成ejs
 app.use(views('views',{extension:'ejs'}));
 
+// 配置静态web服务的中间件
+app.use(koaStatic(__dirname+'./libs'));
+ 
 var ejs = require('ejs');
 // var heredoc = require('heredoc');
 // var tpl = heredoc(function(){/*
